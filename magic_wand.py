@@ -28,7 +28,7 @@ bucket_name = 'eid-magicwand'
 
 def upload_file(file_name, bucket, object_name=None):
     """Upload a file to an S3 bucket
-
+       Reference: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-uploading-files.html
     :param file_name: File to upload
     :param bucket: Bucket to upload to
     :param object_name: S3 object name. If not specified then file_name is used
@@ -51,18 +51,29 @@ def upload_file(file_name, bucket, object_name=None):
 
 # purpose: get and return the transcript structure given the provided uri
 def getTranscript( transcriptURI ):
+    #Reference: https://sunjackson.github.io/2018/08/10/73b0c6a36db932d181f93b01831e3425/
+   
     # Get the resulting Transcription Job and store the JSON response in transcript
     result = requests.get( transcriptURI )
 
     return result.text
 
 def IsAudioTranscriptionSuccess(file_name, bucket):
-    
+    """Transcribe file uploaded to AWS s3 and check if it is equal to "identify"
+       Reference: https://docs.aws.amazon.com/code-samples/latest/catalog/python-transcribe-GettingStarted.py.html
+       Input: file_name - File to be transcribed
+       	      bucket - bucket from where the file is to be transcribed
+       Return: 1 - Image is to be captured
+               0 - Image is not to be captured
+    """
+
     transcribe = boto3.client('transcribe')
     s3 = boto3.client('s3')
 
     job_name = "Test_EID12"
     result_file_name = "%s.json" % (file_name)
+
+    #Constructing audio file url at s3
     job_uri = "s3://%s/%s" % (bucket, file_name)
 
     transcribe.start_transcription_job(
@@ -72,7 +83,8 @@ def IsAudioTranscriptionSuccess(file_name, bucket):
     LanguageCode='en-US'
     #OutputBucketName=bucket
     )
-
+	
+    #Keep looping until transcript ready
     while True:
         status = transcribe.get_transcription_job(TranscriptionJobName=job_name)
         if status['TranscriptionJob']['TranscriptionJobStatus'] in ['COMPLETED', 'FAILED']:
@@ -83,6 +95,7 @@ def IsAudioTranscriptionSuccess(file_name, bucket):
     # Now get the transcript JSON from AWS Transcribe
     transcript = getTranscript( str(status["TranscriptionJob"]["Transcript"]["TranscriptFileUri"]) ) 
     
+    #Convert to dict
     data = json.loads(transcript)
     Actual_Transcript = data['results']['transcripts'][0]['transcript']
     print("Spoken CMD = " + Actual_Transcript)
@@ -93,6 +106,10 @@ def IsAudioTranscriptionSuccess(file_name, bucket):
         return 0
 
 def capture_audio():
+    """Capture audio from mic
+       Reference: https://makersportal.com/blog/2018/8/23/recording-audio-on-the-raspberry-pi-with-python-and-a-usb-microphone
+    """
+
     audio = pyaudio.PyAudio() # create pyaudio instantiation
 
     # create pyaudio stream
