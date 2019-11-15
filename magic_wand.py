@@ -16,14 +16,15 @@ import os
 global image_path
 global rekognition_client
 
+image_path = "images/object.jpg"
 form_1 = pyaudio.paInt16 # 16-bit resolution
 chans = 1 # 1 channel
 samp_rate = 44100 # 44.1kHz sampling rate
 chunk = 4096 # 2^12 samples for buffer
 record_secs = 5 # seconds to record
-dev_index = 1 # device index found by p.get_device_info_by_index(ii)
+dev_index = 2 # device index found by p.get_device_info_by_index(ii)
 wav_output_filename = 'test1.wav' # name of .wav file
-bucket_name = 'eid-superproject'
+bucket_name = 'eid-magicwand'
 
 def upload_file(file_name, bucket, object_name=None):
     """Upload a file to an S3 bucket
@@ -60,7 +61,7 @@ def IsAudioTranscriptionSuccess(file_name, bucket):
     transcribe = boto3.client('transcribe')
     s3 = boto3.client('s3')
 
-    job_name = "Test_EID11"
+    job_name = "Test_EID12"
     result_file_name = "%s.json" % (file_name)
     job_uri = "s3://%s/%s" % (bucket, file_name)
 
@@ -85,7 +86,8 @@ def IsAudioTranscriptionSuccess(file_name, bucket):
     data = json.loads(transcript)
     Actual_Transcript = data['results']['transcripts'][0]['transcript']
     print("Spoken CMD = " + Actual_Transcript)
-    if(Actual_Transcript == "identify."):
+    expected_string = "identify. identified. identifying."
+    if(Actual_Transcript in expected_string):
         return 1
     else:
         return 0
@@ -119,14 +121,14 @@ def capture_audio():
     wavefile.close()
 
 def Configure_Camera():
-    image_path = "images/object.jpg"
+    global camera
     camera = PiCamera()
     camera.rotation = 180
     camera.resolution = (1296,972)
     
 def Capture_Image():
     if os.path.exists(image_path):
-	os.remove(image_path)
+        os.remove(image_path)
     
     camera.start_preview()
     
@@ -138,7 +140,7 @@ def Capture_Image():
     
 def Recognize_Image():
     with open(image_path, 'rb') as image:
-	image_stream = image.read()
+        image_stream = image.read()
     
     response = client.detect_labels(Image={'Bytes':image_stream},
 								MaxLabels=1)
