@@ -25,7 +25,7 @@ chunk = 4096 # 2^12 samples for buffer
 record_secs = 5 # seconds to record
 dev_index = 2 # device index found by p.get_device_info_by_index(ii)
 wav_output_filename = 'test1.wav' # name of .wav file
-bucket_name = 'eid-magicwand'
+bucket_name = 'eid-superproject'
 
 def upload_file(file_name, bucket, object_name=None):
     """Upload a file to an S3 bucket
@@ -71,7 +71,7 @@ def IsAudioTranscriptionSuccess(file_name, bucket):
     transcribe = boto3.client('transcribe')
     s3 = boto3.client('s3')
 
-    job_name = "Test_EID12"
+    job_name = "Test_EID12345"
     result_file_name = "%s.json" % (file_name)
 
     #Constructing audio file url at s3
@@ -192,7 +192,7 @@ def speak(text, format='ogg_vorbis', voice='Brian'):
     
     polly = boto3.client('polly')
     
-    filename="/home/pi/EID_SuperProject/Output_Audio/label.ogg"
+    filename="/home/pi/Desktop/Magic_Wand/EID-Final-Project/Output_Audio/label.ogg"
     
     resp = polly.synthesize_speech(OutputFormat=format, Text=text, VoiceId=voice)
     
@@ -211,7 +211,7 @@ if __name__ == '__main__':
 	upload_file(wav_output_filename, bucket_name)
 	if IsAudioTranscriptionSuccess(wav_output_filename, bucket_name):
 		Capture_Image()
-        image_label = Recognize_Image() + "is the object identifieddd"
+		image_label = Recognize_Image() + "is the object identifieddd"
 		print(image_label)
-        speak(image_label)
+		speak(image_label)
     
