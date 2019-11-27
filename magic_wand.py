@@ -12,7 +12,7 @@ import json
 import requests
 import os
 import pygame
-
+import random
 
 global image_path
 global rekognition_client
@@ -76,7 +76,7 @@ def IsAudioTranscriptionSuccess(file_name, bucket):
     # Get the queue. This returns an SQS.Queue instance
     queue = sqs.get_queue_by_name(QueueName='Magic-Wand.fifo')
 
-    job_name = "Test_EID123"
+    job_name = "Magic_Wand" + str(random.randrange(1,10000,1))
 
     result_file_name = "%s.json" % (file_name)
 
@@ -111,7 +111,8 @@ def IsAudioTranscriptionSuccess(file_name, bucket):
     #Send cmd to sqs
     response = queue.send_message(
 			MessageBody=Actual_Transcript, 
-			MessageGroupId='MessageGroup1')
+			MessageGroupId='MessageGroup1',
+			MessageDeduplicationId = str(random.randrange(1,10000000, 1)))
     
     if(Actual_Transcript in expected_string):
         return 1
