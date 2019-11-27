@@ -70,8 +70,14 @@ def IsAudioTranscriptionSuccess(file_name, bucket):
 
     transcribe = boto3.client('transcribe')
     s3 = boto3.client('s3')
+    # Get the service resource
+    sqs = boto3.resource('sqs')
+    
+    # Get the queue. This returns an SQS.Queue instance
+    queue = sqs.get_queue_by_name(QueueName='Magic-Wand.fifo')
 
-    job_name = "Test_EID12345"
+    job_name = "Test_EID123"
+
     result_file_name = "%s.json" % (file_name)
 
     #Constructing audio file url at s3
@@ -101,6 +107,12 @@ def IsAudioTranscriptionSuccess(file_name, bucket):
     Actual_Transcript = data['results']['transcripts'][0]['transcript']
     print("Spoken CMD = " + Actual_Transcript)
     expected_string = "identify. identified. identifying."
+    
+    #Send cmd to sqs
+    response = queue.send_message(
+			MessageBody=Actual_Transcript, 
+			MessageGroupId='MessageGroup1')
+    
     if(Actual_Transcript in expected_string):
         return 1
     else:
