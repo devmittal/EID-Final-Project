@@ -5,6 +5,7 @@ from time import sleep
 import logging
 import boto3
 import json
+from botocore.exceptions import ClientError
 import os
 
 camera = PiCamera()

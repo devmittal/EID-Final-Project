@@ -26,6 +26,7 @@ record_secs = 5 # seconds to record
 dev_index = 2 # device index found by p.get_device_info_by_index(ii)
 wav_output_filename = 'test1.wav' # name of .wav file
 bucket_name = 'eid-superproject'
+image_bucket = 'eid-superproject-image'
 
 def upload_file(file_name, bucket, object_name=None):
     """Upload a file to an S3 bucket
@@ -160,6 +161,8 @@ def Configure_Camera():
 def Capture_Image():
     if os.path.exists(image_path):
         os.remove(image_path)
+        
+    s3_client = boto3.client('s3')
     
     camera.start_preview()
     
@@ -169,7 +172,25 @@ def Capture_Image():
     
     camera.stop_preview()
     
+    try:
+        resp = s3_client.upload_file(image_path, image_bucket, image_path)
+    except ClientError as e:
+        logging.error(e)
+    
 def Recognize_Image():
+    
+    # Get the service resource
+    sqs = boto3.resource('sqs')
+    
+    # Get the queue. This returns an SQS.Queue instance
+    queue = sqs.get_queue_by_name(QueueName='Magic-Wand.fifo')
+    
+    #Send cmd to sqs to indicate image available in s3 bucket
+    response = queue.send_message(
+			MessageBody="image", 
+			MessageGroupId='MessageGroup1',
+			MessageDeduplicationId = str(random.randrange(1,10000000, 1)))
+    
     with open(image_path, 'rb') as image:
         image_stream = image.read()
     
@@ -181,6 +202,12 @@ def Recognize_Image():
     label_object = json.loads(json_string)
 
     index_object = label_object["Labels"][0]
+    
+    #Send image label to sqs
+    response = queue.send_message(
+			MessageBody=json.dumps(index_object["Name"]), 
+			MessageGroupId='MessageGroup1',
+			MessageDeduplicationId = str(random.randrange(1,10000000, 1)))
 
     return json.dumps(index_object["Name"])
     
