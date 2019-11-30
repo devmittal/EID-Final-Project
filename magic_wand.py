@@ -60,7 +60,7 @@ def getTranscript( transcriptURI ):
 
     return result.text
 
-def IsAudioTranscriptionSuccess(file_name, bucket):
+def IsAudioTranscriptionSuccess(file_name, bucket, action):
     """Transcribe file uploaded to AWS s3 and check if it is equal to "identify"
        Reference: https://docs.aws.amazon.com/code-samples/latest/catalog/python-transcribe-GettingStarted.py.html
        Input: file_name - File to be transcribed
@@ -77,7 +77,7 @@ def IsAudioTranscriptionSuccess(file_name, bucket):
     # Get the queue. This returns an SQS.Queue instance
     queue = sqs.get_queue_by_name(QueueName='Magic-Wand.fifo')
 
-    job_name = "Magic_Wand" + str(random.randrange(1,10000,1))
+    job_name = "Wand" + str(random.randrange(1,100000,1))
 
     result_file_name = "%s.json" % (file_name)
 
@@ -107,7 +107,8 @@ def IsAudioTranscriptionSuccess(file_name, bucket):
     data = json.loads(transcript)
     Actual_Transcript = data['results']['transcripts'][0]['transcript']
     print("Spoken CMD = " + Actual_Transcript)
-    expected_string = "identify. identified. identifying."
+    expected_string_detection = "identify. identified. identifying."
+    expected_string_verify = "correct. wrong."
     
     #Send cmd to sqs
     response = queue.send_message(
@@ -115,10 +116,17 @@ def IsAudioTranscriptionSuccess(file_name, bucket):
 			MessageGroupId='MessageGroup1',
 			MessageDeduplicationId = str(random.randrange(1,10000000, 1)))
     
-    if(Actual_Transcript in expected_string):
-        return 1
+    if action == "detection":
+        if(Actual_Transcript in expected_string_detection):
+            return 1
+        else:
+            return 0
     else:
-        return 0
+        if(Actual_Transcript in expected_string_verify):
+            return 1
+        else:
+            return 0		
+	
 
 def capture_audio():
     """Capture audio from mic
@@ -222,6 +230,7 @@ def play(filename):
     pygame.mixer.music.play()
     while pygame.mixer.music.get_busy() == True:
          pygame.time.Clock().tick(10)
+    pygame.mixer.quit()
 
 def speak(text, format='ogg_vorbis', voice='Brian'):
     """Send text to AWS polly and receive converted audio
@@ -249,9 +258,16 @@ if __name__ == '__main__':
 	Configure_Camera()
 	capture_audio()
 	upload_file(wav_output_filename, bucket_name)
-	if IsAudioTranscriptionSuccess(wav_output_filename, bucket_name):
+	if IsAudioTranscriptionSuccess(wav_output_filename, bucket_name, "detection"):
 		Capture_Image()
 		image_label = Recognize_Image() + "is the object identifieddd"
 		print(image_label)
 		speak(image_label)
-    
+		print("Correct object detected? Say correct/wrong")
+		while True:
+			capture_audio()
+			upload_file(wav_output_filename, bucket_name)
+			if IsAudioTranscriptionSuccess(wav_output_filename, bucket_name, "verify"):
+				print("End of current cycle.")
+				break
+			print("Could not detect. Pls repeat correct/wrong")
