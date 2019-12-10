@@ -2,7 +2,7 @@ import subprocess
 import os
 import sys
 
-sys.path.insert(1, '/home/pi/Desktop/Magic_Wand/EID-Final-Project/rpi-arm-raspbian-8.0-1.1.1')
+sys.path.insert(1, '/home/pi/EID_SuperProject/rpi-arm-raspbian-8.0-1.1.1')
 
 import snowboydecoder
 
