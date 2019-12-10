@@ -8,6 +8,7 @@ import tornado.ioloop
 import tornado.web
 import socket
 import asyncio
+import base64
 
 global sqs
 global s3
@@ -62,6 +63,7 @@ def GetSQSQueueData():
                     DAL.InsertToObject(label, "unclear")
                     DAL.InsertToCommand(confirmation, "No")
                 count += 1
+                message.delete()
                 return label
             # Let the queue know that the message is processed
             message.delete()
@@ -81,11 +83,13 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         print('Message Received: ' + message)
 
         if message == 'Start Polling':
-            label = GetSQSQueueData()
-            with open("images/object.jpg", "rb") as image_file:
+            #label = GetSQSQueueData()
+            with open("downloaded_images/image.jpg", "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())
 
         self.write_message(encoded_string)
+        self.write_message("Hello")
+        self.write_message("Correct")
 
     def on_close(self):
         """Executes when connection closed"""
