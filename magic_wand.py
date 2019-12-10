@@ -241,7 +241,7 @@ def speak(text, format='ogg_vorbis', voice='Brian'):
     
     polly = boto3.client('polly')
     
-    filename="/home/pi/Desktop/Magic_Wand/EID-Final-Project/Output_Audio/label.ogg"
+    filename="/home/pi/EID_SuperProject/Output_Audio/label.ogg"
     
     resp = polly.synthesize_speech(OutputFormat=format, Text=text, VoiceId=voice)
     
@@ -253,21 +253,18 @@ def speak(text, format='ogg_vorbis', voice='Brian'):
     os.remove(filename)
     
 if __name__ == '__main__':
-	client = boto3.client('rekognition')
-	
-	Configure_Camera()
-	capture_audio()
-	upload_file(wav_output_filename, bucket_name)
-	if IsAudioTranscriptionSuccess(wav_output_filename, bucket_name, "detection"):
-		Capture_Image()
-		image_label = Recognize_Image() + "is the object identifieddd"
-		print(image_label)
-		speak(image_label)
-		print("Correct object detected? Say correct/wrong")
-		while True:
-			capture_audio()
-			upload_file(wav_output_filename, bucket_name)
-			if IsAudioTranscriptionSuccess(wav_output_filename, bucket_name, "verify"):
-				print("End of current cycle.")
-				break
-			print("Could not detect. Pls repeat correct/wrong")
+    client = boto3.client('rekognition')
+
+    Configure_Camera()
+    capture_audio()
+    upload_file(wav_output_filename, bucket_name)
+    if IsAudioTranscriptionSuccess(wav_output_filename, bucket_name, "detection"):
+        Capture_Image()
+        image_label = Recognize_Image() + "is the object identifieddd"
+        print(image_label)
+        speak(image_label)
+        print("Correct object detected? Say correct/wrong")
+        capture_audio()
+        upload_file(wav_output_filename, bucket_name)
+        IsAudioTranscriptionSuccess(wav_output_filename, bucket_name, "verify")
+        print("End of current cycle.")
