@@ -36,14 +36,15 @@ while(1):
         else:
             confirmation = message.body
             if confirmation == "correct":
-                DAL.InsertToObject(label, "correct")
+                DAL.InsertToObject(label, "Yes")
                 DAL.InsertToCommand(confirmation, "Yes")
             elif confirmation == "wrong":
                 DAL.InsertToObject(label, "wrong")
                 DAL.InsertToCommand(confirmation, "Yes")
             else:
-                DAL.InsertToObject(label, "inconclusive")
+                DAL.InsertToObject(label, "unclear")
                 DAL.InsertToCommand(confirmation, "No")
+            count += 1
         # Let the queue know that the message is processed
         message.delete()
 
