@@ -52,7 +52,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
         while (1):
             # Process messages by printing out body and optional author name
-            for message in self.queue.receive_messages():
+            for message in queue.receive_messages():
                 # Print out the body
                 print('Message -> {0}'.format(message.body))
 
