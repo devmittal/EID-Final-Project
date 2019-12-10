@@ -74,5 +74,3 @@ def GetCommandData():
             connection.close()
 
         return result
-
-print(GetCommandData())
