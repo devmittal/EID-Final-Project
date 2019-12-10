@@ -36,8 +36,10 @@ Use [pip for python3](https://www.raspberrypi.org/documentation/linux/software/p
 ##### Execution Instructions
 
 On the client pi, run
+
 `python detect_hot_word.py`
 
 On the server pi, run
+
 `server_test.py`
 
