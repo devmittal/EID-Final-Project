@@ -56,12 +56,10 @@ def GetSQSQueueData():
                     DAL.InsertToObject(label, "unclear")
                     DAL.InsertToCommand(confirmation, "No")
                 count += 1
+                return label
             # Let the queue know that the message is processed
             message.delete()
 
             count = count % 4
-
-            if label != "":
-                return label
 
 GetSQSQueueData()
