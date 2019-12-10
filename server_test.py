@@ -2,6 +2,12 @@
 
 import boto3
 import DAL
+import tornado.httpserver
+import tornado.websocket
+import tornado.ioloop
+import tornado.web
+import socket
+import asyncio
 
 global sqs
 global s3
@@ -27,7 +33,7 @@ def GetSQSQueueData():
     while(1):
         # Process messages by printing out body and optional author name
         for message in queue.receive_messages():
-            # Print out the body and author (if set)
+            # Print out the body
             print('Message -> {0}'.format(message.body))
 
             if count == 0:
@@ -61,5 +67,38 @@ def GetSQSQueueData():
             message.delete()
 
             count = count % 4
+            
+class WSHandler(tornado.websocket.WebSocketHandler):
+    """Parent class for web socket"""
+    def open(self):
+        """Executed when client connects"""
+        print('new connection')
+        
+    def on_message(self, message):
+        """Executes when server receives message
+           message - message received by server from client
+        """
+        
+    def on_close(self):
+        """Executes when connection closed"""
+        print('connection closed')
+        
+    def check_origin(self, origin):
+        return True
+    
+    
+application = tornado.web.Application([
+    (r'/ws', WSHandler),
+])
+            
+def CreateTornadoServer():
+    http_server = tornado.httpserver.HTTPServer(application)
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    http_server.listen(6868)
+    myIP = socket.gethostbyname(socket.gethostname())
+    print('*** Websocket Server Started at %s***' % myIP)
+    tornado.ioloop.IOLoop.instance().start()
 
-GetSQSQueueData()
+if __name__ == '__main__':
+    CreateTornadoServer()
+    #GetSQSQueueData()
