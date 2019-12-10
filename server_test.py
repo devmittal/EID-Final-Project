@@ -9,15 +9,23 @@ import tornado.web
 import socket
 import asyncio
 
-class WSHandler(tornado.websocket.WebSocketHandler):
-    # Get the service resource
-    sqs = boto3.resource('sqs')
-    s3 = boto3.client('s3')
-    confirmation = ""
+import base64
 
-<<<<<<< HEAD
-=======
+# Get the service resource
+sqs = boto3.resource('sqs')
+s3 = boto3.client('s3')
+
+def GetSQSQueueObject():
+    return sqs.get_queue_by_name(QueueName='Magic-Wand.fifo')
+
+def GetSQSQueueData():
     queue = GetSQSQueueObject()
+    
+    count = 0
+    label = ""
+    image_bucket = 'eid-superproject-image'
+    object_name = 'images/object.jpg'
+    downloaded_image = 'downloaded_images/image.jpg'
 
     while(1):
         # Process messages by printing out body and optional author name
@@ -50,15 +58,15 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 else:
                     DAL.InsertToObject(label, "unclear")
                     DAL.InsertToCommand(confirmation, "No")
+                message.delete()
                 count += 1
-                return label
+                return label, confirmation
             # Let the queue know that the message is processed
             message.delete()
 
             count = count % 4
             
 class WSHandler(tornado.websocket.WebSocketHandler):
->>>>>>> parent of 2c80421... Functionality to send image and label to client
     """Parent class for web socket"""
     def open(self):
         """Executed when client connects"""
@@ -71,84 +79,22 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         print('Message Received: ' + message)
 
         if message == 'Start Polling':
-<<<<<<< HEAD
-           self.GetSQSQueueData()
-           with open("downloaded_images/image.jpg", "rb") as image_file:
+            label, confirmation = GetSQSQueueData()
+            with open("downloaded_images/image.jpg", "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())
-           self.write_message(encoded_string)
-           self.write_message(label)
-           if self.confirmation == "correct" or self.confirmation == "wrong":
-               self.write_message(self.confirmation)
-           else:
-               self.write_message("inconclusive")
-           
-=======
-            label = GetSQSQueueData()
-            with open("images/object.jpg", "rb") as image_file:
-                encoded_string = base64.b64encode(image_file.read())
-
-        self.write_message(encoded_string)
->>>>>>> parent of 2c80421... Functionality to send image and label to client
+            self.write_message(encoded_string)
+            self.write_message(label)
+            if(confirmation == 'correct' or confirmation == 'wrong'):
+                self.write_message(confirmation)
+            else:
+                self.write_message("Inconclusive")
 
     def on_close(self):
         """Executes when connection closed"""
         print('connection closed')
         
     def check_origin(self, origin):
-        return True
-
-    # Get the queue
-    def GetSQSQueueObject(self):
-        return self.sqs.get_queue_by_name(QueueName='Magic-Wand.fifo')
-
-    def GetSQSQueueData(self):
-        count = 0
-        label = ""
-        image_bucket = 'eid-superproject-image'
-        object_name = 'images/object.jpg'
-        downloaded_image = 'downloaded_images/image.jpg'
-
-        queue = self.GetSQSQueueObject()
-
-        while (1):
-            # Process messages by printing out body and optional author name
-            for message in queue.receive_messages():
-                # Print out the body
-                print('Message -> {0}'.format(message.body))
-
-                if count == 0:
-                    if message.body == "identify.":
-                        DAL.InsertToCommand(message.body, 'Yes')
-                        count += 1
-                    else:
-                        DAL.InsertToCommand(message.body, 'No')
-                        count = 0
-                elif message.body == "image":
-                    print('Dowloading image from s3')
-                    self.s3.download_file(image_bucket, object_name, downloaded_image)
-                    count += 1
-                elif count == 2:
-                    label = message.body
-                    count += 1
-                else:
-                    self.confirmation = message.body
-                    
-                    if self.confirmation == "correct":
-                        DAL.InsertToObject(label, "correct")
-                        DAL.InsertToCommand(self.confirmation, "Yes")                        
-                    elif self.confirmation == "wrong":
-                        DAL.InsertToObject(label, "wrong")
-                        DAL.InsertToCommand(self.confirmation, "Yes")
-                    else:
-                        self.write_message("Inconclusive")
-                    count += 1
-                    message.delete()
-                    break
-                # Let the queue know that the message is processed
-                message.delete()
-
-                count = count % 4
-    
+        return True    
     
 application = tornado.web.Application([
     (r'/ws', WSHandler),
@@ -164,4 +110,3 @@ def CreateTornadoServer():
 
 if __name__ == '__main__':
     CreateTornadoServer()
-    #GetSQSQueueData()
