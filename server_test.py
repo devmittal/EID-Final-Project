@@ -8,7 +8,6 @@ import tornado.ioloop
 import tornado.web
 import socket
 import asyncio
-import base64
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     # Get the service resource
@@ -16,6 +15,50 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     s3 = boto3.client('s3')
     confirmation = ""
 
+<<<<<<< HEAD
+=======
+    queue = GetSQSQueueObject()
+
+    while(1):
+        # Process messages by printing out body and optional author name
+        for message in queue.receive_messages():
+            # Print out the body
+            print('Message -> {0}'.format(message.body))
+
+            if count == 0:
+                if message.body == "identify.":
+                    DAL.InsertToCommand(message.body, 'Yes')
+                    count += 1
+                else:
+                    DAL.InsertToCommand(message.body, 'No')
+                    count = 0
+            elif message.body == "image":
+                print('Dowloading image from s3')
+                s3.download_file(image_bucket, object_name, downloaded_image)
+                count += 1
+            elif count == 2:
+                label = message.body
+                count += 1
+            else:
+                confirmation = message.body
+                if confirmation == "correct":
+                    DAL.InsertToObject(label, "correct")
+                    DAL.InsertToCommand(confirmation, "Yes")
+                elif confirmation == "wrong":
+                    DAL.InsertToObject(label, "wrong")
+                    DAL.InsertToCommand(confirmation, "Yes")
+                else:
+                    DAL.InsertToObject(label, "unclear")
+                    DAL.InsertToCommand(confirmation, "No")
+                count += 1
+                return label
+            # Let the queue know that the message is processed
+            message.delete()
+
+            count = count % 4
+            
+class WSHandler(tornado.websocket.WebSocketHandler):
+>>>>>>> parent of 2c80421... Functionality to send image and label to client
     """Parent class for web socket"""
     def open(self):
         """Executed when client connects"""
@@ -28,6 +71,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         print('Message Received: ' + message)
 
         if message == 'Start Polling':
+<<<<<<< HEAD
            self.GetSQSQueueData()
            with open("downloaded_images/image.jpg", "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())
@@ -38,6 +82,13 @@ class WSHandler(tornado.websocket.WebSocketHandler):
            else:
                self.write_message("inconclusive")
            
+=======
+            label = GetSQSQueueData()
+            with open("images/object.jpg", "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read())
+
+        self.write_message(encoded_string)
+>>>>>>> parent of 2c80421... Functionality to send image and label to client
 
     def on_close(self):
         """Executes when connection closed"""
