@@ -47,4 +47,4 @@ while(1):
         # Let the queue know that the message is processed
         message.delete()
 
-        count = count % 4
+        count = (count + 1) % 4

@@ -39,7 +39,7 @@ def InsertToCommand(received_command, state):
     try:
         connection = OpenConnection()
 
-        query = "INSERT into object (received, state) VALUES (%s, %s)"
+        query = "INSERT into command (received, state) VALUES (%s, %s)"
         values = (received_command, state)
 
         cursor = connection.cursor()
