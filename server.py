@@ -42,7 +42,7 @@ while(1):
                 DAL.InsertToObject(label, "wrong")
                 DAL.InsertToCommand(confirmation, "Yes")
             else:
-                DAL.InsertToObject(label, "inconclusive")
+                DAL.InsertToObject(label, "unclear")
                 DAL.InsertToCommand(confirmation, "No")
         # Let the queue know that the message is processed
         message.delete()
