@@ -26,13 +26,17 @@ while(1):
         if count == 0:
             if message.body == "identify.":
                 DAL.InsertToCommand(message.body, 'Yes')
+                count += 1
             else:
                 DAL.InsertToCommand(message.body, 'No')
+                count = 0
         elif message.body == "image":
             print('Dowloading image from s3')
             s3.download_file(image_bucket, object_name, downloaded_image)
+            count += 1
         elif count == 2:
             label = message.body
+            count += 1
         else:
             confirmation = message.body
             if confirmation == "correct":
@@ -44,7 +48,8 @@ while(1):
             else:
                 DAL.InsertToObject(label, "unclear")
                 DAL.InsertToCommand(confirmation, "No")
+            count += 1
         # Let the queue know that the message is processed
         message.delete()
 
-        count = (count + 1) % 4
+        count = count % 4
