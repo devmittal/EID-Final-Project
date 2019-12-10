@@ -27,7 +27,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         print('Message Received: ' + message)
 
         if message == 'Start Polling':
-            GetSQSQueueData()
+           self.GetSQSQueueData()
 
     def on_close(self):
         """Executes when connection closed"""
@@ -48,7 +48,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         object_name = 'images/object.jpg'
         downloaded_image = 'downloaded_images/image.jpg'
 
-        queue = GetSQSQueueObject()
+        queue = self.GetSQSQueueObject()
 
         while (1):
             # Process messages by printing out body and optional author name
