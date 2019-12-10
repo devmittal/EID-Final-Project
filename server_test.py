@@ -89,6 +89,10 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             else:
                 self.write_message("Inconclusive")
 
+        if message == 'Voice Statistics':
+            result = DAL.GetCommandData()
+            self.write_message(str(result[0][1]) + " " + str(result[1][1]))
+
     def on_close(self):
         """Executes when connection closed"""
         print('connection closed')
