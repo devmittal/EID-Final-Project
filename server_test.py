@@ -20,55 +20,6 @@ s3 = boto3.client('s3')
 # Get the queue
 def GetSQSQueueObject():
     return sqs.get_queue_by_name(QueueName='Magic-Wand.fifo')
-
-def GetSQSQueueData():
-    count = 0
-    label = ""
-    confirmation = ""
-    image_bucket = 'eid-superproject-image'
-    object_name = 'images/object.jpg'
-    downloaded_image = 'downloaded_images/image.jpg'
-
-    queue = GetSQSQueueObject()
-
-    while(1):
-        # Process messages by printing out body and optional author name
-        for message in queue.receive_messages():
-            # Print out the body
-            print('Message -> {0}'.format(message.body))
-
-            if count == 0:
-                if message.body == "identify.":
-                    DAL.InsertToCommand(message.body, 'Yes')
-                    count += 1
-                else:
-                    DAL.InsertToCommand(message.body, 'No')
-                    count = 0
-            elif message.body == "image":
-                print('Dowloading image from s3')
-                s3.download_file(image_bucket, object_name, downloaded_image)
-                count += 1
-            elif count == 2:
-                label = message.body
-                count += 1
-            else:
-                confirmation = message.body
-                if confirmation == "correct":
-                    DAL.InsertToObject(label, "correct")
-                    DAL.InsertToCommand(confirmation, "Yes")
-                elif confirmation == "wrong":
-                    DAL.InsertToObject(label, "wrong")
-                    DAL.InsertToCommand(confirmation, "Yes")
-                else:
-                    DAL.InsertToObject(label, "unclear")
-                    DAL.InsertToCommand(confirmation, "No")
-                count += 1
-                message.delete()
-                return label
-            # Let the queue know that the message is processed
-            message.delete()
-
-            count = count % 4
             
 class WSHandler(tornado.websocket.WebSocketHandler):
     """Parent class for web socket"""
@@ -83,13 +34,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         print('Message Received: ' + message)
 
         if message == 'Start Polling':
-            #label = GetSQSQueueData()
-            with open("downloaded_images/image.jpg", "rb") as image_file:
-                encoded_string = base64.b64encode(image_file.read())
-
-        self.write_message(encoded_string)
-        self.write_message("Hello")
-        self.write_message("Correct")
+            GetSQSQueueData()
 
     def on_close(self):
         """Executes when connection closed"""
@@ -97,6 +42,62 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         
     def check_origin(self, origin):
         return True
+
+    def GetSQSQueueData(self):
+        count = 0
+        label = ""
+        confirmation = ""
+        image_bucket = 'eid-superproject-image'
+        object_name = 'images/object.jpg'
+        downloaded_image = 'downloaded_images/image.jpg'
+
+        queue = GetSQSQueueObject()
+
+        while (1):
+            # Process messages by printing out body and optional author name
+            for message in self.queue.receive_messages():
+                # Print out the body
+                print('Message -> {0}'.format(self.message.body))
+
+                if count == 0:
+                    if message.body == "identify.":
+                        DAL.InsertToCommand(self.message.body, 'Yes')
+                        self.count += 1
+                    else:
+                        DAL.InsertToCommand(self.message.body, 'No')
+                        self.count = 0
+                elif message.body == "image":
+                    print('Dowloading image from s3')
+                    s3.download_file(image_bucket, object_name, downloaded_image)
+                    with open("downloaded_images/image.jpg", "rb") as image_file:
+                        encoded_string = base64.b64encode(image_file.read())
+                    self.write_message(encoded_string)
+                    self.count += 1
+                elif count == 2:
+                    self.label = self.message.body
+                    self.write_message(self.label)
+                    self.count += 1
+                else:
+                    self.confirmation = self.message.body
+                    if self.confirmation == "correct":
+                        DAL.InsertToObject(self.label, "correct")
+                        DAL.InsertToCommand(self.confirmation, "Yes")
+                        self.write_message(self.confirmation)
+                    elif self.confirmation == "wrong":
+                        DAL.InsertToObject(self.label, "wrong")
+                        DAL.InsertToCommand(self.confirmation, "Yes")
+                        self.write_message(self.confirmation)
+                    else:
+                        DAL.InsertToObject(self.label, "unclear")
+                        DAL.InsertToCommand(self.confirmation, "No")
+                        self.write_message("Inconclusive")
+                    self.count += 1
+                    self.message.delete()
+                    break;
+                # Let the queue know that the message is processed
+                self.message.delete()
+
+                self.count = self.count % 4
     
     
 application = tornado.web.Application([

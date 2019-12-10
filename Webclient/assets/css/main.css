@@ -2543,7 +2543,6 @@ input, select, textarea {
 	ul.img_btn
 	{
 		padding-top: 25px;
-		padding-right: 395px;
 	}
 
 	div.detected_image
@@ -2561,7 +2560,7 @@ input, select, textarea {
 
 	li.horzsources
 	{
-		float: left;
+		list-style-type: none;
 		width: 50%;
 		padding-left: 10px;
 		padding-right: 10px;

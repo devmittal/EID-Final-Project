@@ -27,10 +27,6 @@
 			var tornado_uri = "/ws"
 			var tornado_ws = new WebSocket("ws://" + host + ":" + tornado_port + tornado_uri);
 			
-			var node_port = "9797"
-			var node_uri = "/ws"
-			var node_ws = new WebSocket("ws://" + host + ":" + node_port + node_uri)
-			
 			// Open Websocket callback for Tornado
 			tornado_ws.onopen = function(evt) 
 			{ 
@@ -46,20 +42,6 @@
 				$('#tornado_ws_status').css('border-color', 'gray');
 			};
 			
-			// Open Websocket callback for Node JS
-			node_ws.onopen = function(evt) 
-			{ 
-            	$('#node_ws_status').css('background-color', 'green');
-				$('#node_ws_status').css('border-color', 'green');
-	  		};
-			
-			// Close Websocket callback for Node JS
-			node_ws.onclose = function(evt) 
-			{
-				/*alert("Connection Closed");*/
-				$('#node_ws_status').css('background-color', 'gray');
-				$('#node_ws_status').css('border-color', 'gray');
-			};
 		</script>
 	</head>
 	<body class="is-preload">
@@ -81,7 +63,7 @@
 						<!-- Content -->
 							<section id="content" class="main">
 									<section align="center">
-										<h2 align="center">Image Captured</h2>
+										<h2 align="center">Point & Shoot</h2>
 										<!--<h3>Temperature & Humidity</h3>-->
 										<div class="detected_image">
 											<div class="row gtr-uniform">
@@ -99,11 +81,28 @@
 														$('#btn_StartSQSPolling').click(function()
 														{
 															var img = $('#img_DetectedImage');
+															var label =$('#lbl_ImageLabel'); 
+															var status = $('lbl_DetectionStatus');
+															var count = 0;
 															tornado_ws.send("Start Polling");
 															tornado_ws.onmessage = function(evt) 
 															{
-																var im = 'data:image/png;base64,' + evt.data;
-																img.attr('src',im);
+																var data = evt.data;
+																if(count == 0)
+																{
+																	var im = 'data:image/png;base64,' + data;
+																	img.attr('src',im);
+																	count = 1;
+																}
+																else if(count == 1)
+																{
+																	label.text(data);
+																	count = 2;
+																}
+																else
+																{
+																	label.text(label.text() + ' - ' + data);
+																}
 															};
 														});
 													</script>
