@@ -60,3 +60,5 @@ def GetSQSQueueData():
 
         if count == 4:
             return label
+
+GetSQSQueueData()
