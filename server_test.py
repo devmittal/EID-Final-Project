@@ -14,6 +14,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     # Get the service resource
     sqs = boto3.resource('sqs')
     s3 = boto3.client('s3')
+    confirmation = ""
 
     """Parent class for web socket"""
     def open(self):
@@ -28,6 +29,15 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
         if message == 'Start Polling':
            self.GetSQSQueueData()
+           with open("downloaded_images/image.jpg", "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read())
+           self.write_message(encoded_string)
+           self.write_message(label)
+           if self.confirmation == "correct" or self.confirmation == "wrong":
+               self.write_message(self.confirmation)
+           else:
+               self.write_message("inconclusive")
+           
 
     def on_close(self):
         """Executes when connection closed"""
@@ -43,7 +53,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     def GetSQSQueueData(self):
         count = 0
         label = ""
-        confirmation = ""
         image_bucket = 'eid-superproject-image'
         object_name = 'images/object.jpg'
         downloaded_image = 'downloaded_images/image.jpg'
@@ -66,27 +75,20 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 elif message.body == "image":
                     print('Dowloading image from s3')
                     self.s3.download_file(image_bucket, object_name, downloaded_image)
-                    with open("downloaded_images/image.jpg", "rb") as image_file:
-                        encoded_string = base64.b64encode(image_file.read())
-                    self.write_message(encoded_string)
                     count += 1
                 elif count == 2:
                     label = message.body
-                    self.write_message(label)
                     count += 1
                 else:
-                    confirmation = message.body
-                    if confirmation == "correct":
+                    self.confirmation = message.body
+                    
+                    if self.confirmation == "correct":
                         DAL.InsertToObject(label, "correct")
-                        DAL.InsertToCommand(confirmation, "Yes")
-                        self.write_message(confirmation)
-                    elif confirmation == "wrong":
+                        DAL.InsertToCommand(self.confirmation, "Yes")                        
+                    elif self.confirmation == "wrong":
                         DAL.InsertToObject(label, "wrong")
-                        DAL.InsertToCommand(confirmation, "Yes")
-                        self.write_message(confirmation)
+                        DAL.InsertToCommand(self.confirmation, "Yes")
                     else:
-                        DAL.InsertToObject(label, "unclear")
-                        DAL.InsertToCommand(confirmation, "No")
                         self.write_message("Inconclusive")
                     count += 1
                     message.delete()
