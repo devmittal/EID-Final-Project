@@ -54,3 +54,25 @@ def InsertToCommand(received_command, state):
         if (connection.is_connected()):
             cursor.close()
             connection.close()
+
+def GetCommandData():
+    try:
+        connection = OpenConnection()
+
+        query = "select state, count(*) from command group by state"
+        cursor = connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+    except Error as e:
+        print("Error while fetching humidity from Thermostat", e)
+        result = None
+
+    finally:
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return result
+
+print(GetCommandData())

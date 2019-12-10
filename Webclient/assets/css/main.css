@@ -2558,10 +2558,16 @@ input, select, textarea {
 		
 	}
 
+	li.horz
+	{
+		list-style-type: none;
+		margin-right: 400px;
+
+	}
+
 	li.horzsources
 	{
 		list-style-type: none;
-		width: 50%;
 		padding-left: 10px;
 		padding-right: 10px;
 	}
@@ -3845,4 +3851,8 @@ input, select, textarea {
 			}
 
 		}.fa-pyth {
+}
+.fa-tw {
+}
+.fa-ins {
 }
