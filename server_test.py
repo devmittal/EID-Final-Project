@@ -78,7 +78,15 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         """Executes when server receives message
            message - message received by server from client
         """
-        
+        print('Message Received: ' + message)
+
+        if message == 'Start Polling':
+            label = GetSQSQueueData()
+            with open("images/object.jpg", "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read())
+
+        self.write_message(encoded_string)
+
     def on_close(self):
         """Executes when connection closed"""
         print('connection closed')

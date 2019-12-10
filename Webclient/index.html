@@ -1,0 +1,466 @@
+<!DOCTYPE HTML>
+<!--
+	File: index.html
+	Description = This web client is a part of Embedded Interface Design Project-2. The web client fetches multifarious information from two distinct we servers hosted remotely in a Raspberry Pi viz. Python Tornado & Node JS
+	Authors = Souvik De, Devansh Mittal
+	Reference = https://html5up.net
+-->
+<html>
+	<head>
+		<title>EID Super Project Web Client</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>jQuery UI Button - Default functionality</title>
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<link rel="stylesheet" href="/resources/demos/style.css">
+		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<script>
+			 // create websocket instance
+			var host = "10.0.0.85";
+			
+			var tornado_port = "6868"
+			var tornado_uri = "/ws"
+			var tornado_ws = new WebSocket("ws://" + host + ":" + tornado_port + tornado_uri);
+			
+			var node_port = "9797"
+			var node_uri = "/ws"
+			var node_ws = new WebSocket("ws://" + host + ":" + node_port + node_uri)
+			
+			// Open Websocket callback for Tornado
+			tornado_ws.onopen = function(evt) 
+			{ 
+            	$('#tornado_ws_status').css('background-color', 'palevioletred');
+				$('#tornado_ws_status').css('border-color', 'palevioletred');
+	  		};
+			
+			// Close Websocket callback for Tornado
+			tornado_ws.onclose = function(evt) 
+			{
+				/*alert("Connection Closed");*/
+				$('#tornado_ws_status').css('background-color', 'gray');
+				$('#tornado_ws_status').css('border-color', 'gray');
+			};
+			
+			// Open Websocket callback for Node JS
+			node_ws.onopen = function(evt) 
+			{ 
+            	$('#node_ws_status').css('background-color', 'green');
+				$('#node_ws_status').css('border-color', 'green');
+	  		};
+			
+			// Close Websocket callback for Node JS
+			node_ws.onclose = function(evt) 
+			{
+				/*alert("Connection Closed");*/
+				$('#node_ws_status').css('background-color', 'gray');
+				$('#node_ws_status').css('border-color', 'gray');
+			};
+		</script>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+				<!-- Header -->
+					<ul class="wsstatus">
+						<li class="wstype"><socketstatusgray id="tornado_ws_status">TORNADO</socketstatusgray></li>
+					</ul>
+					<header id="header">
+						<h1>Magic Wand - Super Project</h1>
+						<p>Embedded Interface Design ECEN-5783-002</p>
+					</header>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Content -->
+							<section id="content" class="main">
+									<section align="center">
+										<h2 align="center">Image Captured</h2>
+										<!--<h3>Temperature & Humidity</h3>-->
+										<div class="detected_image">
+											<div class="row gtr-uniform">
+												<div class="col-7"><span class="image fit"><img class="object_detected" id="img_DetectedImage" src="images/pic01.jpg" alt="" /></span></div>
+												<!--<div class="col-6"><span class="image fit"><img id="img_Humidity" src="images/pic02.jpg" alt="" /></span></div>-->
+											</div>
+											<ul class="img_btn">
+												<li class="horzsources">
+													<h2 id=lbl_ImageLabel>Image Label</h2>
+												</li>
+												<li class="horzsources">
+													<a id="btn_StartSQSPolling" href="#" class="button primary icon solidfa-download" style="font-size:15px">Get SQS Data</a>
+													<script>
+														/* Fetch temperature plot image from tornado server as Base64 and set image source to display it */
+														$('#btn_StartSQSPolling').click(function()
+														{
+															var img = $('#img_DetectedImage');
+															tornado_ws.send("Start Polling");
+															tornado_ws.onmessage = function(evt) 
+															{
+																var im = 'data:image/png;base64,' + evt.data;
+																img.attr('src',im);
+															};
+														});
+													</script>
+												</li>
+<!--
+												<li>
+													<a id="btn_GetHumidityPlot" href="#" class="button primary icon solidfa-download" style="font-size:15px">Plot Humidity</a>
+													<script>
+														/* Fetch humidity plot image from tornado server as Base64 and set image source to display it */
+														$('#btn_GetHumidityPlot').click(function()
+														{
+															var img = $('#img_Humidity');
+															tornado_ws.send("Fetch Plot Humidity");
+															tornado_ws.onmessage = function(evt) 
+															{
+																var im = 'data:image/png;base64,' + evt.data;
+																img.attr('src',im);
+															};
+														});
+													</script>
+												</li>
+-->
+											</ul>
+										</div>
+									</section>
+
+									<section>
+										<input class="TempUnit" type="checkbox" id="chk_ChangetoF" name="chk_ChangetoF" unchecked>
+										<label class="TempUnit" for="chk_ChangetoF">°F</label>
+										<ul class="dht22">
+											<li class="horzsources">
+											<ul class="statistics">
+												<li class="style1">
+													<span class="fa-thermometer-half fas" style="font-size:36px"></span>
+													<strong id="lbl_TorTemp">... °C</strong> Temperature
+												</li>
+												<li class="style5">
+													<span class="fa-tint fas" style="font-size:36px"></span>
+													<strong id="lbl_TorHumd">... %</strong> Humidity
+												</li>
+											</ul>
+											
+										 	<ul><a id="btn_TorTempHumd" href="#" class="icon brands alt fa-python" style="font-size:30px"></a></ul>
+											<script>
+												/* Value Change Event for CheckBox - Converts exsisting Celcius data to Farhenheit and vice versa */
+												$("#chk_ChangetoF").change(function()
+											   	{
+													var TorTempLabel = $('#lbl_TorTemp');
+													var NJTempLabel = $('#lbl_NjTemp');
+													
+													if(this.checked)
+													{	
+														if((TorTempLabel.text() != "... °C") &&  (TorTempLabel.text() != "n/a"))
+														{
+															var TorTemp = parseFloat(TorTempLabel.text().split()[0]);
+															TorTempLabel.text((TorTemp * (9/5) + 32).toFixed(1).toString() + " °F");
+														}
+														
+														if((NJTempLabel.text() != "... °C") && (NJTempLabel.text() != "n/a"))
+														{
+															var NjTemp = parseFloat(NJTempLabel.text().split()[0]);
+															NJTempLabel.text((NjTemp * (9/5) + 32).toFixed(1).toString() + " °F");
+														}
+													}
+													else
+													{
+														if((TorTempLabel.text() != "... °C") &&  (TorTempLabel.text() != "n/a"))
+														{
+															var TorTemp = parseFloat(TorTempLabel.text().split()[0]);
+															TorTempLabel.text(((TorTemp - 32)*(5/9)).toFixed(1).toString() + " °C");
+														}
+														
+														if((NJTempLabel.text() != "... °C") && (NJTempLabel.text() != "n/a"))
+														{
+															var NjTemp = parseFloat(NJTempLabel.text().split()[0]);
+															NJTempLabel.text(((NjTemp - 32)*(5/9)).toFixed(1).toString() + " °C");
+														}
+													}
+												});
+												
+												/* Fetches temperature & humidity from Tornado Server and if required converts it to Farhenheit based on CheckBox Value */
+												$('#btn_TorTempHumd').click(function()
+											   	{
+													var CheckBox = $("#chk_ChangetoF");
+													var $temperature = $('#lbl_TorTemp');
+													var $humidity = $('#lbl_TorHumd');
+													tornado_ws.send("Fetch DHT22 Data");
+													tornado_ws.onmessage = function(evt) 
+													{
+														if (evt.data == "Sensor N/A")
+														{
+															$temperature.text("n/a");
+															$humidity.text("n/a");		
+														}
+														else
+														{
+															var data = evt.data.split("|");
+															
+															if(CheckBox.is(":checked"))
+															{
+																var tempC = parseFloat(data[0].split()[0]);
+																$temperature.text((tempC * (9/5) + 32).toFixed(1).toString() + " °F");
+															}
+															else
+															{
+																$temperature.text(data[0]);
+															}
+															
+															$humidity.text(data[1]);	
+														}
+													};
+												});
+											</script>
+											</li>
+											
+											<li class="horzsources">
+											<ul class="statistics">
+												<li class="style2">
+													<span class="fa-thermometer-half fas" style="font-size:36px"></span>
+													<strong id="lbl_NjTemp">... °C</strong> Temperature
+												</li>
+												<li class="style4">
+													<span class="fa-tint fas" style="font-size:36px"></span>
+													<strong id="lbl_NjHumd">... %</strong> Humidity
+												</li>
+												
+											</ul>
+
+										 	<ul><a id="btn_NjTempHumd" href="#" class="icon brands alt fa-node-js" style="font-size:30px"></a></ul>
+											<script>
+												/* Fetches temperature & humidity from Node JS Server and if required converts it to Farhenheit based on CheckBox Value */
+												$('#btn_NjTempHumd').click(function()
+											   	{
+													var CheckBox = $("#chk_ChangetoF");
+													var $temperature = $('#lbl_NjTemp');
+													var $humidity = $('#lbl_NjHumd');
+													node_ws.send("Fetch DHT22 Data");
+													node_ws.onmessage = function(evt) 
+													{
+														if (evt.data == "Sensor N/A")
+														{
+															$temperature.text("n/a");
+															$humidity.text("n/a");		
+														}
+														else
+														{
+															var data = evt.data.split("|");
+															
+															if(CheckBox.is(":checked"))
+															{
+																var tempC = parseFloat(data[0].split()[0]);
+																$temperature.text((tempC * (9/5) + 32).toFixed(1).toString() + " °F");
+															}
+															else
+															{
+																$temperature.text(data[0]);
+															}
+															
+															$humidity.text(data[1]);	
+														}
+													};
+												});
+											</script>
+										</li>
+										</ul>
+									</section>
+
+								<!-- Lists -->
+							  <section>
+									</section>
+
+								<!-- Table -->
+									<section>
+										<h2>Humidity Values</h2>
+										<h3>Node .JS Server</h3>
+										<div class="table-wrapper" align="center">
+											<table id="tlb_NodeHumidity">
+												<thead>
+													<tr>
+														<th>Humidity (%)</th>
+														<th>Transaction Start</th>
+														<th>Transaction End</th>
+														<th>Duration (ms)</th>
+													</tr>
+												</thead>
+												<tbody>
+													<!--<tr>
+														<td>HD1</td>
+														<td>ST1</td>
+														<td>ET1</td>
+														<td>TD1</td>
+													</tr>-->
+												</tbody>
+												<!--<tfoot>
+													<tr>
+														<td colspan="2"></td>
+														<td style="text-align: center">
+															<a href="#" class="button icon solid fa-upload">Icon</a>
+														</td>
+													</tr>
+												</tfoot>-->
+											</table>
+											<a id="btn_NodeFetchHumidity" href="#" class="button primary icon solidfa-download">Fetch Entries</a>
+											<script>
+												/* Fetches 10 humidity from Node JS Server and Calculates the Start Time, End Time & Duration of Transaction (Latency) */
+												$('#btn_NodeFetchHumidity').click(function()
+											   	{
+													/*alert("Jolly Good Mate");*/
+													var njtable = $('#tlb_NodeHumidity');
+													var sdt = new Date($.now());
+													var StartDate = sdt.getDate()+"-"+(sdt.getMonth() + 1)+"-"+sdt.getFullYear()+" "+sdt.getHours()+":"+sdt.getMinutes()+":"+sdt.getSeconds()+":"+
+														sdt.getMilliseconds();
+													var StartEpoch = $.now();
+													node_ws.send("Fetch last 10 humidity");
+													node_ws.onmessage = function(evt) 
+													{
+														if(($("#tlb_NodeHumidity tr").length - 1) != 0)
+														{
+															$("#tlb_NodeHumidity").find("tr:gt(0)").remove();
+														}
+														
+														var edt = new Date($.now());
+														var EndDate = edt.getDate()+"-"+(edt.getMonth() + 1)+"-"+edt.getFullYear()+" "+edt.getHours()+":"+edt.getMinutes()+":"+edt.getSeconds()+":"+
+														edt.getMilliseconds();
+														var EndEpoch = $.now();
+														var EpochDiff = EndEpoch - StartEpoch;
+														var buffer = evt.data.split(',');
+														$.each(buffer, function (index, value) 
+														{
+															njtable.append(
+																			"<tr>" +
+																			"<td>" + value + "</td>" +
+																			"<td>" + StartDate + "</td>" +
+																			"<td>" + EndDate + "</td>" +
+																			"<td>" + EpochDiff + "</td>" +
+																			"</tr>"
+																		);
+														});
+													};
+												});
+											</script>
+										</div>
+
+										<h3>Tornado Server</h3>
+										<div class="table-wrapper" align="center">
+											<table id="tlb_TorHumidity">
+												<thead>
+													<tr>
+														<th>Humidity (%)</th>
+														<th>Transaction Start</th>
+														<th>Transaction End</th>
+														<th>Duration (ms)</th>
+													</tr>
+												</thead>
+												<tbody>
+													<!--<tr>
+														<td>HD1</td>
+														<td>ST1</td>
+														<td>ET1</td>
+														<td>TD1</td>
+													</tr>-->
+												</tbody>
+<!--												<tfoot>
+													<tr>
+														<td colspan="2"></td>
+														<td>100.00</td>
+													</tr>
+												</tfoot>-->
+											</table>
+											<a id="btn_TorFetchHumidity" href="#" class="button primary icon solidfa-download">Fetch Entries</a>
+											<script>
+												/* Fetches 10 humidity from the Tornado Server and Calculates the Start Time, End Time & Duration of Transaction (Latency) */
+												$('#btn_TorFetchHumidity').click(function()
+											   	{
+													var tortable = $('#tlb_TorHumidity');
+													var sdt = new Date($.now());
+													var StartDate = sdt.getDate()+"-"+(sdt.getMonth() + 1)+"-"+sdt.getFullYear()+" "+sdt.getHours()+":"+sdt.getMinutes()+":"+sdt.getSeconds()+":"+
+														sdt.getMilliseconds();
+													var StartEpoch = $.now();
+													tornado_ws.send("Fetch last 10 humidity");
+													tornado_ws.onmessage = function(evt) 
+													{
+														if(($("#tlb_TorHumidity tr").length - 1) != 0)
+														{
+															$("#tlb_TorHumidity").find("tr:gt(0)").remove();
+														}
+														
+														var edt = new Date($.now());
+														var EndDate = edt.getDate()+"-"+(edt.getMonth() + 1)+"-"+edt.getFullYear()+" "+edt.getHours()+":"+edt.getMinutes()+":"+edt.getSeconds()+":"+
+														edt.getMilliseconds();
+														var EndEpoch = $.now();
+														var EpochDiff = EndEpoch - StartEpoch;
+														var buffer = evt.data.split(',');
+														$.each(buffer, function (index, value) 
+														{
+															tortable.append(
+																			"<tr>" +
+																			"<td>" + value + "</td>" +
+																			"<td>" + StartDate + "</td>" +
+																			"<td>" + EndDate + "</td>" +
+																			"<td>" + EpochDiff + "</td>" +
+																			"</tr>"
+																		);
+														});
+													};
+												});
+											</script>
+										</div>
+									</section>
+
+								<!-- Buttons -->
+									<section>
+							  </section>
+
+								<!-- Form -->
+									<section>
+									</section>
+
+								<!-- Image -->
+									
+							</section>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<section>
+							<h2>About</h2>
+							<p>This web client is a part of Embedded Interface Design Project-2. Authored by Souvik De & Devansh Mittal. The web client fetches multifarious information from two distinct we servers hosted remotely in a Raspberry Pi viz. Python Tornado & Node JS</p>
+						</section>
+						<section>
+							<h2>Contact</h2>
+							<dl class="alt">
+								<dt>Address</dt>
+								<dd>University of Colorado &bull; Boulder, CO 80302 &bull; USA</dd>
+								<dt>Email</dt>
+								<dd><a href="#">svikde@gmail.com &bull; devansh3@gmail.com</a></dd>
+							</dl>
+							<ul class="icons">
+								<li><a href="https://www.linkedin.com/in/svikde/" class="icon brands alt fa-linkedin" target="_blank"><span class="label">LinkedIn Souvik</span></a></li>
+								<li><a href="https://www.linkedin.com/in/devansh-mittal/" class="icon brands alt fa-linkedin" target="_blank"><span class="label">LinkedIn Devansh</span></a></li>								
+								<li><a href="https://github.com/svikde/EID-Fall19/tree/master/Project2" class="icon brands fa-github alt" target="_blank"><span class="label">GitHub Project2</span></a></li>
+							</ul>
+						</section>
+						<p class="copyright">&copy; University of Coloraod Boulder.</p>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
