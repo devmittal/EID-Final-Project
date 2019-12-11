@@ -59,13 +59,33 @@ def GetCommandData():
     try:
         connection = OpenConnection()
 
-        query = "select state, count(*) from command group by state"
+        query = "select state, count(*) from command group by state order by state asc"
         cursor = connection.cursor()
         cursor.execute(query)
         result = cursor.fetchall()
 
     except Error as e:
-        print("Error while fetching humidity from Thermostat", e)
+        print("Error while fetching Voice Command Data from Command Table", e)
+        result = None
+
+    finally:
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return result
+
+def GetObjectData():
+    try:
+        connection = OpenConnection()
+
+        query = "select state, count(*) from object group by state order by state asc"
+        cursor = connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+    except Error as e:
+        print("Error while fetching Object Detection Data from Object Table", e)
         result = None
 
     finally:
