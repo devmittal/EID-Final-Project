@@ -35,7 +35,7 @@ Follow the instructions at [MySQL on Raspberry Pi](https://pimylifeup.com/raspbe
 
 Use [pip for python3](https://www.raspberrypi.org/documentation/linux/software/python.md) to install [SQL Connector](https://pynative.com/install-mysql-connector-python/) for Python. This page also contains information on how to use and implement the APIs on python to access your MySQL Database.
 
-Create the following tableS to store all spoken commands and objects detected.
+Create the following tables to store all spoken commands and objects detected.
 ```sh
 MariaDB [project1db]> CREATE TABLE command( 
 >	          received VARCHAR(100) NOT NULL, 
