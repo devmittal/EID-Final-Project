@@ -16,6 +16,7 @@ def OpenConnection():
                            password='vickmit')
 
 def InsertToObject(label, state):
+    """To Insert Data into the Object Table"""
     try:
         connection = OpenConnection()
 
@@ -36,6 +37,7 @@ def InsertToObject(label, state):
             connection.close()
 
 def InsertToCommand(received_command, state):
+    """To Insert Data into the Command Table"""
     try:
         connection = OpenConnection()
 
@@ -56,6 +58,7 @@ def InsertToCommand(received_command, state):
             connection.close()
 
 def GetCommandData():
+    """Fetch the count of valid and invalid commands from the command table"""
     try:
         connection = OpenConnection()
 
@@ -76,6 +79,7 @@ def GetCommandData():
         return result
 
 def GetObjectData():
+    """Fetch the count of valid and invalid objects detected from the object table"""
     try:
         connection = OpenConnection()
 
@@ -96,6 +100,7 @@ def GetObjectData():
         return result
 
 def FetchObjectTableData(count=10):
+    """Fetch label and state data from object table"""
     try:
         connection = OpenConnection()
 
@@ -116,6 +121,7 @@ def FetchObjectTableData(count=10):
         return result
         
 def FetchCommandTableData(count=10):
+    """Fetch command and state data from command table"""
     try:
         connection = OpenConnection()
 
@@ -136,6 +142,7 @@ def FetchCommandTableData(count=10):
         return result
 
 def GetObjectTable(count=10):
+    """Convert Object Data from Table into string from tuple"""
     result = FetchObjectTableData()
     cat = ""
     for i in range(count):
@@ -146,6 +153,7 @@ def GetObjectTable(count=10):
     return cat
 
 def GetCommandTable(count=10):
+    """Convert Command Data from Table into string from tuple"""
     result = FetchCommandTableData()
     cat = ""
     for i in range(count):
