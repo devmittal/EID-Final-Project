@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+"""
+    __file__ = magic_wand.py
+    __description = Code to capture voice command, image and output audio on speaker.
+                    Also communicates with the AWS services.
+    __author__ = Souvik De, Devansh Mittal
+"""
+
 from picamera import PiCamera
 from time import sleep
 import pyaudio
@@ -89,7 +96,6 @@ def IsAudioTranscriptionSuccess(file_name, bucket, action):
     Media={'MediaFileUri': job_uri},
     MediaFormat='wav',
     LanguageCode='en-US'
-    #OutputBucketName=bucket
     )
 	
     #Keep looping until transcript ready
@@ -161,12 +167,14 @@ def capture_audio():
     wavefile.close()
 
 def Configure_Camera():
+    """Configures the camera"""
     global camera
     camera = PiCamera()
     camera.rotation = 180
     camera.resolution = (1296,972)
     
 def Capture_Image():
+    """Captures the image"""
     if os.path.exists(image_path):
         os.remove(image_path)
         
@@ -186,7 +194,8 @@ def Capture_Image():
         logging.error(e)
     
 def Recognize_Image():
-    
+    """Run AWS Image Rekognition to get label of image. Send label to SQS
+    Return - label """
     # Get the service resource
     sqs = boto3.resource('sqs')
     
