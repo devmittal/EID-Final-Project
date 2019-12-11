@@ -23,6 +23,7 @@ Create a fifo queue named 'Magic-Wand.fifo'. Remember to enable content-based de
 Refer to ["Recording Audio on the Raspberry Pi with Python and a USB Microphone"](https://makersportal.com/blog/2018/8/23/recording-audio-on-the-raspberry-pi-with-python-and-a-usb-microphone) to ensure that the microphone is correctly integrated with the pi. Take note of the index of the USB device and replace it in line 26 of magic_wand.py.  
 
 ##### Camera
+Raspberry Pi indegeneous libraries are required to integrate the Pi Camera. Refere to [this](https://projects.raspberrypi.org/en/projects/getting-started-with-picamera) for more information on how to integrate the camera with the Pi.
 
 ##### Snowboy Hotword Detector
 Run the following command
@@ -33,6 +34,20 @@ Run the following command
 Follow the instructions at [MySQL on Raspberry Pi](https://pimylifeup.com/raspberry-pi-mysql/) to install and setup MySQL Server for Raspberry Pi. This link also contains information on how to create a database and user with privillages to access the DB.
 
 Use [pip for python3](https://www.raspberrypi.org/documentation/linux/software/python.md) to install [SQL Connector](https://pynative.com/install-mysql-connector-python/) for Python. This page also contains information on how to use and implement the APIs on python to access your MySQL Database.
+
+Create the following tableS to store all spoken commands and objects detected.
+```sh
+MariaDB [project1db]> CREATE TABLE command( 
+>	          received VARCHAR(100) NOT NULL, 
+>	          state VARCHAR(10) NOT NULL,
+>	          entrytimestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);
+```
+```sh
+MariaDB [project1db]> CREATE TABLE object( 
+>	          label VARCHAR(100) NOT NULL, 
+>	          state VARCHAR(10) NOT NULL,
+>	          entrytimestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);
+```
 
 ##### Execution Instructions
 
