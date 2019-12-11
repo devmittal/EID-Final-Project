@@ -10,8 +10,8 @@ Devansh Mittal
 
 ### Notes and Installations Instructions
 
-##### AWS Setup
-Copy and paste your AWS access key id, AWS secret access key and AWS session token into ~/.aws/credentials. These keys expire after a certain period of time so keep replacing the credentials file with the up-to-date keys.
+##### AWS and boto3 Setup
+Follow the steps specified [here](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html) in order to install Boto3 and setup your authentication credentials. Copy and paste your AWS access key id, AWS secret access key and AWS session token into ~/.aws/credentials. These keys expire after a certain period of time so keep replacing the credentials file with the up-to-date keys.
 
 ##### Creating S3 buckets
 Create two S3 buckets named 'eid-superproject' and 'eid-superproject-image' on AWS. Keep default settings. One is to store the voice commands and the other stores the images to be sent to the server pi.
