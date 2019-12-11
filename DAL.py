@@ -94,3 +94,24 @@ def GetObjectData():
             connection.close()
 
         return result
+
+def FetchObjectData(count=10):
+    try:
+        connection = OpenConnection()
+
+        query = "select label,state from object order by entrytimestamp desc limit " + str(count)
+        cursor = connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+    except Error as e:
+        print("Error while fetching data from Object Table", e)
+        result = None
+
+    finally:
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return result
+

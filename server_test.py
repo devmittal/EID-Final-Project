@@ -97,6 +97,10 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             result = DAL.GetObjectData()
             self.write_message(str(result[0][1]) + " " + str(result[1][1]) + " " + str(result[2][1]))
 
+        if message == 'Detection Data':
+            object_collection = DAL.FetchObjectData()
+            self.write_message(str(humidity_collection).split('(')[1].split(')')[0])
+
     def on_close(self):
         """Executes when connection closed"""
         print('connection closed')

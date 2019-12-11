@@ -200,8 +200,8 @@
 													{	
 														var data = evt.data.split(' ');
 														var total = parseFloat(data[0]) + parseFloat(data[1]);
-														var wrong = ((parseFloat(data[0])* 100)/total).toString();
-														var right = ((parseFloat(data[1])* 100)/total).toString();
+														var wrong = ((parseFloat(data[0])* 100)/total).toFixed(1);
+														var right = ((parseFloat(data[1])* 100)/total).toFixed(1);
 														
 														lbl_total.text(total.toString());
 														lbl_correct.text(right.toString() + " %");
@@ -240,19 +240,21 @@
 											   	{
 													var lbl_total = $('#lbl_ImgTotal');
 													var lbl_correct = $('#lbl_ImgCorrect');
-													var lbl_incorrect = $('#lbl_ImgWrong');
 													var lbl_unclear	=	$("#lbl_ImgUnclear");
+													var lbl_incorrect = $('#lbl_ImgWrong');													
 													
 													tornado_ws.send("Detection Statistics");
 													tornado_ws.onmessage = function(evt) 
 													{	
 														var data = evt.data.split(' ');
-														var total = parseFloat(data[0]) + parseFloat(data[1]);
-														var wrong = ((parseFloat(data[0])* 100)/total).toString();
-														var right = ((parseFloat(data[1])* 100)/total).toString();
+														var total = parseFloat(data[0]) + parseFloat(data[1]) + parseFloat(data[2]);
+														var right = ((parseFloat(data[0])* 100)/total).toFixed(1);
+														var unclear = ((parseFloat(data[1])* 100)/total).toFixed(1);
+														var wrong = ((parseFloat(data[2])* 100)/total).toFixed(1);
 														
 														lbl_total.text(total.toString());
 														lbl_correct.text(right.toString() + " %");
+														lbl_unclear.text(unclear.toString() + " %");
 														lbl_incorrect.text(wrong.toString() + " %");
 													}
 												});
@@ -267,7 +269,7 @@
 
 								<!-- Table -->
 									<section>
-										<h2>Humidity Values</h2>
+										<h2>Tables</h2>
 										<h3>Node .JS Server</h3>
 										<div class="table-wrapper" align="center">
 											<table id="tlb_NodeHumidity">
@@ -337,15 +339,13 @@
 											</script>
 										</div>
 
-										<h3>Tornado Server</h3>
+										<h3>Object Identification Data</h3>
 										<div class="table-wrapper" align="center">
-											<table id="tlb_TorHumidity">
+											<table id="tlb_ObjectData">
 												<thead>
 													<tr>
-														<th>Humidity (%)</th>
-														<th>Transaction Start</th>
-														<th>Transaction End</th>
-														<th>Duration (ms)</th>
+														<th>Object Detected</th>
+														<th>Detection Success</th>
 													</tr>
 												</thead>
 												<tbody>
@@ -363,12 +363,12 @@
 													</tr>
 												</tfoot>-->
 											</table>
-											<a id="btn_TorFetchHumidity" href="#" class="button primary icon solidfa-download">Fetch Entries</a>
+											<a id="btn_FetchObjectData" href="#" class="button primary icon solidfa-download">Fetch Entries</a>
 											<script>
 												/* Fetches 10 humidity from the Tornado Server and Calculates the Start Time, End Time & Duration of Transaction (Latency) */
-												$('#btn_TorFetchHumidity').click(function()
+												$('#btn_FetchObjectData').click(function()
 											   	{
-													var tortable = $('#tlb_TorHumidity');
+													var tortable = $('#btn_FetchObjectData');
 													var sdt = new Date($.now());
 													var StartDate = sdt.getDate()+"-"+(sdt.getMonth() + 1)+"-"+sdt.getFullYear()+" "+sdt.getHours()+":"+sdt.getMinutes()+":"+sdt.getSeconds()+":"+
 														sdt.getMilliseconds();
