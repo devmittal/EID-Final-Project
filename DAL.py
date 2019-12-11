@@ -95,7 +95,7 @@ def GetObjectData():
 
         return result
 
-def FetchObjectData(count=10):
+def FetchObjectTableData(count=10):
     try:
         connection = OpenConnection()
 
@@ -114,4 +114,43 @@ def FetchObjectData(count=10):
             connection.close()
 
         return result
+        
+def FetchCommandTableData(count=10):
+    try:
+        connection = OpenConnection()
 
+        query = "select received,state from command order by entrytimestamp desc limit " + str(count)
+        cursor = connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+    except Error as e:
+        print("Error while fetching data from Command Table", e)
+        result = None
+
+    finally:
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+
+        return result
+
+def GetObjectTable(count=10):
+    result = FetchObjectTableData()
+    cat = ""
+    for i in range(count):
+        if i < 9:
+            cat += str(result[i][0]) + "-" + str(result[i][1]) + ","
+        else:
+            cat += str(result[i][0]) + "-" + str(result[i][1])
+    return cat
+
+def GetCommandTable(count=10):
+    result = FetchCommandTableData()
+    cat = ""
+    for i in range(count):
+        if i < 9:
+            cat += str(result[i][0]) + "-" + str(result[i][1]) + ","
+        else:
+            cat += str(result[i][0]) + "-" + str(result[i][1])
+    return cat
