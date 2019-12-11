@@ -57,7 +57,7 @@ On the client pi, run
 
 On the server pi, run
 
-`server_test.py`
+`./server_test.py`
 
 For the website, navigate to [Webclient/index.html](https://github.com/devmittal/EID-Final-Project/tree/master/Webclient).
 
