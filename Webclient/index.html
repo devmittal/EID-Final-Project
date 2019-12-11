@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <!--
 	File: index.html
-	Description = This web client is a part of Embedded Interface Design Project-2. The web client fetches multifarious information from two distinct we servers hosted remotely in a Raspberry Pi viz. Python Tornado & Node JS
+	Description = This web client is a part of Embedded Interface Design Super Project. The web client fetches multifarious information from the Tornado Server hosted on the Server Pi.
 	Authors = Souvik De, Devansh Mittal
 	Reference = https://html5up.net
 -->
@@ -67,7 +67,6 @@
 										<div class="detected_image">
 											<div class="row gtr-uniform">
 												<div class="col-7"><span class="image fit"><img class="object_detected" id="img_DetectedImage" src="images/pic01.jpg" alt="" /></span></div>
-												<!--<div class="col-6"><span class="image fit"><img id="img_Humidity" src="images/pic02.jpg" alt="" /></span></div>-->
 											</div>
 											<ul class="img_btn">
 												<li class="horz">
@@ -76,7 +75,7 @@
 												<li class="horz">
 													<a id="btn_StartSQSPolling" href="#" class="button primary icon solidfa-download" style="font-size:15px">Get SQS Data</a>
 													<script>
-														/* Fetch temperature plot image from tornado server as Base64 and set image source to display it */
+														/* Fetch Image, label & authentication of Object being Detected */
 														$('#btn_StartSQSPolling').click(function()
 														{
 															var img = $('#img_DetectedImage');
@@ -106,31 +105,12 @@
 														});
 													</script>
 												</li>
-<!--
-												<li>
-													<a id="btn_GetHumidityPlot" href="#" class="button primary icon solidfa-download" style="font-size:15px">Plot Humidity</a>
-													<script>
-														/* Fetch humidity plot image from tornado server as Base64 and set image source to display it */
-														$('#btn_GetHumidityPlot').click(function()
-														{
-															var img = $('#img_Humidity');
-															tornado_ws.send("Fetch Plot Humidity");
-															tornado_ws.onmessage = function(evt) 
-															{
-																var im = 'data:image/png;base64,' + evt.data;
-																img.attr('src',im);
-															};
-														});
-													</script>
-												</li>
--->
 											</ul>
 										</div>
 									</section>
 
 									<section>
-										<!--<input class="TempUnit" type="checkbox" id="chk_ChangetoF" name="chk_ChangetoF" unchecked>
-										<label class="TempUnit" for="chk_ChangetoF">°F</label>-->
+										
 										<h1 align="center">Statistics</h1>
 										<h4 align="center">Commad Statistics</h4>
 										<ul class="dht22">
@@ -152,43 +132,8 @@
 											
 										 	<ul><a id="btn_GetVoiceCmdStats" href="#" class="icon brands alt fas fa-teamspeak" style="font-size:30px"></a></ul>
 											<script>
-												/* Value Change Event for CheckBox - Converts exsisting Celcius data to Farhenheit and vice versa */
-												/*$("#chk_ChangetoF").change(function()
-											   	{
-													var TorTempLabel = $('#lbl_TorTemp');
-													var NJTempLabel = $('#lbl_NjTemp');
-													
-													if(this.checked)
-													{	
-														if((TorTempLabel.text() != "... °C") &&  (TorTempLabel.text() != "n/a"))
-														{
-															var TorTemp = parseFloat(TorTempLabel.text().split()[0]);
-															TorTempLabel.text((TorTemp * (9/5) + 32).toFixed(1).toString() + " °F");
-														}
-														
-														if((NJTempLabel.text() != "... °C") && (NJTempLabel.text() != "n/a"))
-														{
-															var NjTemp = parseFloat(NJTempLabel.text().split()[0]);
-															NJTempLabel.text((NjTemp * (9/5) + 32).toFixed(1).toString() + " °F");
-														}
-													}
-													else
-													{
-														if((TorTempLabel.text() != "... °C") &&  (TorTempLabel.text() != "n/a"))
-														{
-															var TorTemp = parseFloat(TorTempLabel.text().split()[0]);
-															TorTempLabel.text(((TorTemp - 32)*(5/9)).toFixed(1).toString() + " °C");
-														}
-														
-														if((NJTempLabel.text() != "... °C") && (NJTempLabel.text() != "n/a"))
-														{
-															var NjTemp = parseFloat(NJTempLabel.text().split()[0]);
-															NJTempLabel.text(((NjTemp - 32)*(5/9)).toFixed(1).toString() + " °C");
-														}
-													}
-												});
-*/												
-												/* Fetches temperature & humidity from Tornado Server and if required converts it to Farhenheit based on CheckBox Value */
+									
+												/* Fetch Voice Command Statistics */
 												$('#btn_GetVoiceCmdStats').click(function()
 											   	{
 													var lbl_total = $('#lbl_CmdTotal');
@@ -235,7 +180,7 @@
 
 										 	<ul><a id="btn_GetObjectDetectonStats" href="#" class="icon brands alt fa-ins fa-instagram" style="font-size:30px"></a></ul>
 											<script>
-												/* Fetches temperature & humidity from Node JS Server and if required converts it to Farhenheit based on CheckBox Value */
+												/* Fetch Object Detection Statistics */
 												$('#btn_GetObjectDetectonStats').click(function()
 											   	{
 													var lbl_total = $('#lbl_ImgTotal');
@@ -284,7 +229,7 @@
 											</table>
 											<a id="btn_FetchCommandData" href="#" class="button primary icon solidfa-download">Fetch Entries</a>
 											<script>
-												/* Fetches 10 humidity from Node JS Server and Calculates the Start Time, End Time & Duration of Transaction (Latency) */
+												/* Fetch las 10 data from command table */
 												$('#btn_FetchCommandData').click(function()
 											   	{
 													var table = $('#tlb_CommandData');
@@ -329,7 +274,7 @@
 											</table>
 											<a id="btn_FetchObjectData" href="#" class="button primary icon solidfa-download">Fetch Entries</a>
 											<script>
-												/* Fetches 10 humidity from the Tornado Server and Calculates the Start Time, End Time & Duration of Transaction (Latency) */
+												/* Fetch las 10 data from object table */
 												$('#btn_FetchObjectData').click(function()
 											   	{
 													var table = $('#tlb_ObjectData');
@@ -378,7 +323,7 @@
 					<footer id="footer">
 						<section>
 							<h2>About</h2>
-							<p>This web client is a part of Embedded Interface Design Project-2. Authored by Souvik De & Devansh Mittal. The web client fetches multifarious information from two distinct we servers hosted remotely in a Raspberry Pi viz. Python Tornado & Node JS</p>
+							<p>Super Project - Magic Wand (Embedded Interface Design)</p>
 						</section>
 						<section>
 							<h2>Contact</h2>

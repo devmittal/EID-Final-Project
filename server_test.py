@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 
+"""
+	__file__ = server.py
+	__description = Sends data to Web Client via Tornado Server, Polls on SQS Queue & Communicates with DA:
+	__author__ = Souvik De, Devansh Mittal
+"""
+
 import boto3
 import DAL
 import tornado.httpserver
@@ -19,6 +25,7 @@ def GetSQSQueueObject():
     return sqs.get_queue_by_name(QueueName='Magic-Wand.fifo')
 
 def GetSQSQueueData():
+    """Poll on SQS Queue to retrieve dataprocessed Data from AWS"""
     queue = GetSQSQueueObject()
     
     count = 0
@@ -33,6 +40,7 @@ def GetSQSQueueData():
             # Print out the body
             print('Message -> {0}'.format(message.body))
 
+            """Sequeced in the order - Command, Retrieve Image, Detect Label & Spoken Acknowledgement"""""
             if count == 0:
                 if message.body == "identify.":
                     DAL.InsertToCommand(message.body, 'Yes')
