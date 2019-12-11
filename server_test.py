@@ -34,7 +34,8 @@ def GetSQSQueueData():
             print('Message -> {0}'.format(message.body))
 
             if count == 0:
-                if message.body == "identify.":
+                expected_string = "identify. identifying. identified."
+                if message.body in expected_string:
                     DAL.InsertToCommand(message.body, 'Yes')
                     count += 1
                 else:
