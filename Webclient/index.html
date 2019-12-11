@@ -270,67 +270,42 @@
 								<!-- Table -->
 									<section>
 										<h2>Tables</h2>
-										<h3>Node .JS Server</h3>
+										<h3>Command Data</h3>
 										<div class="table-wrapper" align="center">
-											<table id="tlb_NodeHumidity">
+											<table id="tlb_CommandData">
 												<thead>
 													<tr>
-														<th>Humidity (%)</th>
-														<th>Transaction Start</th>
-														<th>Transaction End</th>
-														<th>Duration (ms)</th>
+														<th>Command Spoken</th>
+														<th>Detection Success</th>
 													</tr>
 												</thead>
 												<tbody>
-													<!--<tr>
-														<td>HD1</td>
-														<td>ST1</td>
-														<td>ET1</td>
-														<td>TD1</td>
-													</tr>-->
 												</tbody>
-												<!--<tfoot>
-													<tr>
-														<td colspan="2"></td>
-														<td style="text-align: center">
-															<a href="#" class="button icon solid fa-upload">Icon</a>
-														</td>
-													</tr>
-												</tfoot>-->
 											</table>
-											<a id="btn_NodeFetchHumidity" href="#" class="button primary icon solidfa-download">Fetch Entries</a>
+											<a id="btn_FetchCommandData" href="#" class="button primary icon solidfa-download">Fetch Entries</a>
 											<script>
 												/* Fetches 10 humidity from Node JS Server and Calculates the Start Time, End Time & Duration of Transaction (Latency) */
-												$('#btn_NodeFetchHumidity').click(function()
+												$('#btn_FetchCommandData').click(function()
 											   	{
-													/*alert("Jolly Good Mate");*/
-													var njtable = $('#tlb_NodeHumidity');
-													var sdt = new Date($.now());
-													var StartDate = sdt.getDate()+"-"+(sdt.getMonth() + 1)+"-"+sdt.getFullYear()+" "+sdt.getHours()+":"+sdt.getMinutes()+":"+sdt.getSeconds()+":"+
-														sdt.getMilliseconds();
-													var StartEpoch = $.now();
-													node_ws.send("Fetch last 10 humidity");
-													node_ws.onmessage = function(evt) 
+													var table = $('#tlb_CommandData');
+																										
+													tornado_ws.send("Command Data");
+													tornado_ws.onmessage = function(evt) 
 													{
-														if(($("#tlb_NodeHumidity tr").length - 1) != 0)
+														if(($("#tlb_CommandData tr").length - 1) != 0)
 														{
-															$("#tlb_NodeHumidity").find("tr:gt(0)").remove();
+															$("#tlb_CommandData").find("tr:gt(0)").remove();
 														}
-														
-														var edt = new Date($.now());
-														var EndDate = edt.getDate()+"-"+(edt.getMonth() + 1)+"-"+edt.getFullYear()+" "+edt.getHours()+":"+edt.getMinutes()+":"+edt.getSeconds()+":"+
-														edt.getMilliseconds();
-														var EndEpoch = $.now();
-														var EpochDiff = EndEpoch - StartEpoch;
+																						
 														var buffer = evt.data.split(',');
 														$.each(buffer, function (index, value) 
 														{
-															njtable.append(
+															//alert(value);
+															var data = value.split('-');
+															table.append(
 																			"<tr>" +
-																			"<td>" + value + "</td>" +
-																			"<td>" + StartDate + "</td>" +
-																			"<td>" + EndDate + "</td>" +
-																			"<td>" + EpochDiff + "</td>" +
+																			"<td>" + data[0] + "</td>" +
+																			"<td>" + data[1] + "</td>" +
 																			"</tr>"
 																		);
 														});
@@ -349,52 +324,33 @@
 													</tr>
 												</thead>
 												<tbody>
-													<!--<tr>
-														<td>HD1</td>
-														<td>ST1</td>
-														<td>ET1</td>
-														<td>TD1</td>
-													</tr>-->
 												</tbody>
-<!--												<tfoot>
-													<tr>
-														<td colspan="2"></td>
-														<td>100.00</td>
-													</tr>
-												</tfoot>-->
+
 											</table>
 											<a id="btn_FetchObjectData" href="#" class="button primary icon solidfa-download">Fetch Entries</a>
 											<script>
 												/* Fetches 10 humidity from the Tornado Server and Calculates the Start Time, End Time & Duration of Transaction (Latency) */
 												$('#btn_FetchObjectData').click(function()
 											   	{
-													var tortable = $('#btn_FetchObjectData');
-													var sdt = new Date($.now());
-													var StartDate = sdt.getDate()+"-"+(sdt.getMonth() + 1)+"-"+sdt.getFullYear()+" "+sdt.getHours()+":"+sdt.getMinutes()+":"+sdt.getSeconds()+":"+
-														sdt.getMilliseconds();
-													var StartEpoch = $.now();
-													tornado_ws.send("Fetch last 10 humidity");
+													var table = $('#tlb_ObjectData');
+																										
+													tornado_ws.send("Detection Data");
 													tornado_ws.onmessage = function(evt) 
 													{
-														if(($("#tlb_TorHumidity tr").length - 1) != 0)
+														if(($("#tlb_ObjectData tr").length - 1) != 0)
 														{
-															$("#tlb_TorHumidity").find("tr:gt(0)").remove();
+															$("#tlb_ObjectData").find("tr:gt(0)").remove();
 														}
-														
-														var edt = new Date($.now());
-														var EndDate = edt.getDate()+"-"+(edt.getMonth() + 1)+"-"+edt.getFullYear()+" "+edt.getHours()+":"+edt.getMinutes()+":"+edt.getSeconds()+":"+
-														edt.getMilliseconds();
-														var EndEpoch = $.now();
-														var EpochDiff = EndEpoch - StartEpoch;
+																						
 														var buffer = evt.data.split(',');
 														$.each(buffer, function (index, value) 
 														{
-															tortable.append(
+															//alert(value);
+															var data = value.split('-');
+															table.append(
 																			"<tr>" +
-																			"<td>" + value + "</td>" +
-																			"<td>" + StartDate + "</td>" +
-																			"<td>" + EndDate + "</td>" +
-																			"<td>" + EpochDiff + "</td>" +
+																			"<td>" + data[0] + "</td>" +
+																			"<td>" + data[1] + "</td>" +
 																			"</tr>"
 																		);
 														});
