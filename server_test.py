@@ -49,10 +49,10 @@ def GetSQSQueueData():
                 count += 1
             else:
                 confirmation = message.body
-                if confirmation == "correct":
+                if confirmation == "correct.":
                     DAL.InsertToObject(label, "correct")
                     DAL.InsertToCommand(confirmation, "Yes")
-                elif confirmation == "wrong":
+                elif confirmation == "wrong.":
                     DAL.InsertToObject(label, "wrong")
                     DAL.InsertToCommand(confirmation, "Yes")
                 else:
