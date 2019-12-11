@@ -84,7 +84,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 encoded_string = base64.b64encode(image_file.read())
             self.write_message(encoded_string)
             self.write_message(label)
-            if(confirmation == 'correct' or confirmation == 'wrong'):
+            if(confirmation == 'correct.' or confirmation == 'wrong.'):
                 self.write_message(confirmation)
             else:
                 self.write_message("Inconclusive")
@@ -92,6 +92,10 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         if message == 'Voice Statistics':
             result = DAL.GetCommandData()
             self.write_message(str(result[0][1]) + " " + str(result[1][1]))
+
+        if message == 'Detection Statistics':
+            result = DAL.GetObjectData()
+            self.write_message(str(result[0][1]) + " " + str(result[1][1]) + " " + str(result[2][1]))
 
     def on_close(self):
         """Executes when connection closed"""

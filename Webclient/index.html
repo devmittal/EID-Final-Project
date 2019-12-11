@@ -87,7 +87,6 @@
 															tornado_ws.onmessage = function(evt) 
 															{
 																var data = evt.data;
-																alert(data);
 																if(count == 0)
 																{
 																	var im = 'data:image/png;base64,' + data;
@@ -234,39 +233,28 @@
 												
 											</ul>
 
-										 	<ul><a id="btn_NjTempHumd" href="#" class="icon brands alt fa-ins fa-instagram" style="font-size:30px"></a></ul>
+										 	<ul><a id="btn_GetObjectDetectonStats" href="#" class="icon brands alt fa-ins fa-instagram" style="font-size:30px"></a></ul>
 											<script>
 												/* Fetches temperature & humidity from Node JS Server and if required converts it to Farhenheit based on CheckBox Value */
-												$('#btn_NjTempHumd').click(function()
+												$('#btn_GetObjectDetectonStats').click(function()
 											   	{
-													var CheckBox = $("#chk_ChangetoF");
-													var $temperature = $('#lbl_NjTemp');
-													var $humidity = $('#lbl_NjHumd');
-													node_ws.send("Fetch DHT22 Data");
-													node_ws.onmessage = function(evt) 
-													{
-														if (evt.data == "Sensor N/A")
-														{
-															$temperature.text("n/a");
-															$humidity.text("n/a");		
-														}
-														else
-														{
-															var data = evt.data.split("|");
-															
-															if(CheckBox.is(":checked"))
-															{
-																var tempC = parseFloat(data[0].split()[0]);
-																$temperature.text((tempC * (9/5) + 32).toFixed(1).toString() + " °F");
-															}
-															else
-															{
-																$temperature.text(data[0]);
-															}
-															
-															$humidity.text(data[1]);	
-														}
-													};
+													var lbl_total = $('#lbl_ImgTotal');
+													var lbl_correct = $('#lbl_ImgCorrect');
+													var lbl_incorrect = $('#lbl_ImgWrong');
+													var lbl_unclear	=	$("#lbl_ImgUnclear");
+													
+													tornado_ws.send("Detection Statistics");
+													tornado_ws.onmessage = function(evt) 
+													{	
+														var data = evt.data.split(' ');
+														var total = parseFloat(data[0]) + parseFloat(data[1]);
+														var wrong = ((parseFloat(data[0])* 100)/total).toString();
+														var right = ((parseFloat(data[1])* 100)/total).toString();
+														
+														lbl_total.text(total.toString());
+														lbl_correct.text(right.toString() + " %");
+														lbl_incorrect.text(wrong.toString() + " %");
+													}
 												});
 											</script>
 										</li>
